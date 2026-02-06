@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human-Only Puzzle</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .phone {
+            width: 375px;
+            height: 667px;
+            background: #000;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        
+        .notch {
+            width: 150px;
+            height: 25px;
+            background: #000;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 14px;
+            padding-top: 10px;
+        }
+        
+        .time {
+            font-weight: 600;
+        }
+        
+        .battery {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .content {
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .challenge-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .challenge-header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .challenge-header p {
+            font-size: 13px;
+            color: #888;
+        }
+        
+        .challenge-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .challenge-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4facfe;
+        }
+        
+        .challenge-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+        
+        .input-group {
+            margin-top: 15px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .input-group input::placeholder {
+            color: #666;
+        }
+        
+        .shake-detector {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, rgba(255,107,107,0.2) 0%, rgba(255,159,64,0.2) 100%);
+            border-radius: 20px;
+            margin: 20px 0;
+        }
+        
+        .shake-status {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .shake-count {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ff6b6b;
+        }
+        
+        .orientation-box {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            margin: 15px 0;
+        }
+        
+        .orientation-item {
+            text-align: center;
+        }
+        
+        .orientation-label {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        
+        .orientation-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #4facfe;
+        }
+        
+        .instruction-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .instruction-list li {
+            padding: 10px 0;
+            padding-left: 25px;
+            position: relative;
+            font-size: 13px;
+            color: #ccc;
+        }
+        
+        .instruction-list li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #4facfe;
+        }
+        
+        .hidden-element {
+            position: absolute;
+            opacity: 0.03;
+            font-size: 8px;
+            bottom: 50px;
+            right: 20px;
+            color: #fff;
+            pointer-events: none;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            border-radius: 15px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .timer {
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+            <div class="status-bar">
+                <div class="time" id="timeDisplay">9:41</div>
+                <div class="battery">
+                    <span id="batteryLevel">100%</span>
+                    <span>🔋</span>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="challenge-header">
+                    <h1>🧠 HUMAN VERIFICATION</h1>
+                    <p>AI Cannot Complete This</p>
+                </div>
+                
+                <div class="challenge-box">
+                    <div class="challenge-title">Challenge 1: Reality Check</div>
+                    <div class="challenge-text">
+                        Look at the brightest light source in your room right now. What color temperature is it? (warm/cool/neutral)
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="lightInput" placeholder="Your answer...">
+                    </div>
+                </div>
+                
+                <div class="challenge-box">
+                    <div class="challenge-title">Challenge 2: Physical Interaction</div>
+                    <div class="shake-detector">
+                        <div class="shake-status">Shake Your Device!</div>
+                        <div class="shake-count" id="shakeCount">0</div>
+                        <div style="font-size: 12px; color: #888; margin-top: 10px;">
+                            Required: 5 shakes
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="challenge-box">
+                    <div class="challenge-title">Challenge 3: Sensory Memory</div>
+                    <div class="challenge-text">
+                        Without looking at a clock, how many seconds have passed since you started this challenge?
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="timeInput" placeholder="Seconds...">
+                    </div>
+                </div>
+                
+                <div class="challenge-box">
+                    <div class="challenge-title">Challenge 4: Device Orientation</div>
+                    <div class="orientation-box">
+                        <div class="orientation-item">
+                            <div class="orientation-label">TILT X</div>
+                            <div class="orientation-value" id="tiltX">0°</div>
+                        </div>
+                        <div class="orientation-item">
+                            <div class="orientation-label">TILT Y</div>
+                            <div class="orientation-value" id="tiltY">0°</div>
+                        </div>
+                    </div>
+                    <ul class="instruction-list">
+                        <li>Tilt your device to the left (X < -20°)</li>
+                        <li>Then tilt to the right (X > 20°)</li>
+                        <li>Rotation unlocks verification</li>
+                    </ul>
+                </div>
+                
+                <button class="submit-btn" id="submitBtn" disabled>
+                    Complete All Challenges First
+                </button>
+                
+                <div class="timer" id="timerDisplay">
+                    Time elapsed: 0s
+                </div>
+                
+                <div class="hidden-element">
+                    The answer lies in the moment between thoughts
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let shakeCount = 0;
+        let tilted = { left: false, right: false };
+        let startTime = Date.now();
+        let lastShake = 0;
+        
+        // Update time display
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours() % 12 || 12;
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('timeDisplay').textContent = `${hours}:${minutes}`;
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // Timer
+        setInterval(() => {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('timerDisplay').textContent = `Time elapsed: ${elapsed}s`;
+        }, 1000);
+        
+        // Shake detection
+        if (window.DeviceMotionEvent) {
+            window.addEventListener('devicemotion', (event) => {
+                const acceleration = event.accelerationIncludingGravity;
+                const threshold = 15;
+                
+                if (acceleration.x > threshold || acceleration.y > threshold || acceleration.z > threshold) {
+                    const now = Date.now();
+                    if (now - lastShake > 500) {
+                        shakeCount++;
+                        lastShake = now;
+                        document.getElementById('shakeCount').textContent = shakeCount;
+                        checkCompletion();
+                    }
+                }
+            });
+        }
+        
+        // Orientation detection
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', (event) => {
+                const gamma = Math.round(event.gamma); // left/right tilt
+                const beta = Math.round(event.beta);   // front/back tilt
+                
+                document.getElementById('tiltX').textContent = gamma + '°';
+                document.getElementById('tiltY').textContent = beta + '°';
+                
+                if (gamma < -20) tilted.left = true;
+                if (gamma > 20) tilted.right = true;
+                
+                checkCompletion();
+            });
+        }
+        
+        // Check if all challenges completed
+        function checkCompletion() {
+            const lightAnswer = document.getElementById('lightInput').value.trim();
+            const timeAnswer = document.getElementById('timeInput').value;
+            const shakeComplete = shakeCount >= 5;
+            const tiltComplete = tilted.left && tilted.right;
+            
+            if (lightAnswer && timeAnswer && shakeComplete && tiltComplete) {
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('submitBtn').textContent = '✓ SUBMIT VERIFICATION';
+            }
+        }
+        
+        document.getElementById('lightInput').addEventListener('input', checkCompletion);
+        document.getElementById('timeInput').addEventListener('input', checkCompletion);
+        
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const actualTime = parseInt(document.getElementById('timeInput').value);
+            const accuracy = Math.abs(elapsed - actualTime);
+            
+            alert(`🎉 HUMAN VERIFIED!\n\nYour Results:\n✓ Physical interaction: ${shakeCount} shakes\n✓ Device manipulation: Complete\n✓ Time estimation: ${accuracy}s off\n✓ Environmental awareness: Recorded\n\nAI Success Rate: 0%\nHuman Success Rate: 100%`);
+        });
+        
+        // Simulate battery drain for realism
+        let battery = 100;
+        setInterval(() => {
+            battery = Math.max(20, battery - Math.random() * 2);
+            document.getElementById('batteryLevel').textContent = Math.floor(battery) + '%';
+        }, 5000);
+    </script>
+</body>
+</html>
