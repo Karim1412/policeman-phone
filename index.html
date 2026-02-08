@@ -1,982 +1,1390 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Human Enigma Challenge</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .phone {
-            width: 375px;
-            height: 667px;
-            background: #000;
-            border-radius: 40px;
-            padding: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-            position: relative;
-        }
-        
-        .notch {
-            width: 150px;
-            height: 25px;
-            background: #000;
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 0 0 20px 20px;
-            z-index: 10;
-        }
-        
-        .screen {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
-            border-radius: 30px;
-            overflow-y: auto;
-            position: relative;
-        }
-        
-        .status-bar {
-            height: 44px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            color: #fff;
-            font-size: 14px;
-            padding-top: 10px;
-        }
-        
-        .time {
-            font-weight: 600;
-        }
-        
-        .battery {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .content {
-            padding: 20px;
-            color: #fff;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, rgba(142,45,226,0.1) 0%, rgba(74,0,224,0.1) 100%);
-            border-radius: 20px;
-            border: 1px solid rgba(142,45,226,0.3);
-        }
-        
-        .header h1 {
-            font-size: 26px;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #8e2de2 0%, #4a00e0 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        .header p {
-            font-size: 13px;
-            color: #888;
-            font-style: italic;
-        }
-        
-        .enigma-container {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-        
-        .enigma-container.solved {
-            border-color: rgba(46,213,115,0.5);
-            background: rgba(46,213,115,0.05);
-        }
-        
-        .enigma-number {
-            display: inline-block;
-            background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
-            color: #fff;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
-        }
-        
-        .enigma-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #fff;
-        }
-        
-        .enigma-text {
-            font-size: 15px;
-            line-height: 1.8;
-            color: #bbb;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            border-left: 3px solid #8e2de2;
-            font-family: 'Courier New', monospace;
-        }
-        
-        .hint-box {
-            background: rgba(255,193,7,0.1);
-            border: 1px solid rgba(255,193,7,0.3);
-            border-radius: 10px;
-            padding: 12px;
-            margin: 15px 0;
-            font-size: 12px;
-            color: #ffc107;
-        }
-        
-        .hint-box::before {
-            content: "💡 HINT: ";
-            font-weight: 700;
-        }
-        
-        .input-group {
-            margin-top: 20px;
-        }
-        
-        .input-label {
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .input-wrapper {
-            position: relative;
-        }
-        
-        .enigma-input {
-            width: 100%;
-            padding: 15px;
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s ease;
-            text-align: center;
-            font-weight: 600;
-            letter-spacing: 2px;
-        }
-        
-        .enigma-input:focus {
-            border-color: #8e2de2;
-            background: rgba(142,45,226,0.1);
-        }
-        
-        .enigma-input.correct {
-            border-color: #2ed573;
-            background: rgba(46,213,115,0.1);
-        }
-        
-        .enigma-input::placeholder {
-            color: #555;
-            letter-spacing: normal;
-        }
-        
-        .status-icon {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 20px;
-            display: none;
-        }
-        
-        .status-icon.show {
-            display: block;
-        }
-        
-        .password-section {
-            margin-top: 30px;
-            padding: 25px;
-            background: linear-gradient(135deg, rgba(255,71,87,0.1) 0%, rgba(255,107,107,0.1) 100%);
-            border: 2px solid rgba(255,71,87,0.3);
-            border-radius: 20px;
-        }
-        
-        .password-title {
-            text-align: center;
-            font-size: 16px;
-            color: #ff6b6b;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 700;
-        }
-        
-        .password-hint {
-            text-align: center;
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 20px;
-        }
-        
-        .password-input {
-            width: 100%;
-            padding: 18px;
-            background: rgba(0,0,0,0.4);
-            border: 2px solid rgba(255,71,87,0.5);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 18px;
-            text-align: center;
-            outline: none;
-            letter-spacing: 3px;
-            font-weight: 700;
-        }
-        
-        .password-input::placeholder {
-            color: #555;
-            letter-spacing: normal;
-        }
-        
-        .submit-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(90deg, #8e2de2 0%, #4a00e0 100%);
-            border: none;
-            border-radius: 15px;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 20px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: all 0.3s ease;
-        }
-        
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(142,45,226,0.4);
-        }
-        
-        .submit-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #8e2de2 0%, #4a00e0 100%);
-            border-radius: 10px;
-            transition: width 0.5s ease;
-            width: 0%;
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #555;
-            font-size: 11px;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        .mystery-element {
-            position: fixed;
-            bottom: -100px;
-            right: 20px;
-            font-size: 8px;
-            color: rgba(255,255,255,0.02);
-            pointer-events: none;
-            font-family: monospace;
-        }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #0f0c29 0%,
+          #302b63 50%,
+          #24243e 100%
+        );
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
 
-        /* Messages Dashboard Styles */
-        .messages-dashboard {
-            display: none;
-            padding: 20px;
-        }
+      .phone {
+        width: 375px;
+        height: 667px;
+        background: #000;
+        border-radius: 40px;
+        padding: 15px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        position: relative;
+      }
 
-        .messages-dashboard.active {
-            display: block;
-        }
+      .notch {
+        width: 150px;
+        height: 25px;
+        background: #000;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 0 0 20px 20px;
+        z-index: 10;
+      }
 
-        .messages-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            margin-bottom: 20px;
-        }
+      .screen {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+        border-radius: 30px;
+        overflow-y: auto;
+        position: relative;
+      }
 
-        .messages-header h2 {
-            font-size: 22px;
-            color: #fff;
-        }
+      .status-bar {
+        height: 44px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+        color: #fff;
+        font-size: 14px;
+        padding-top: 10px;
+      }
 
-        .back-btn {
-            background: rgba(142,45,226,0.2);
-            border: 1px solid rgba(142,45,226,0.5);
-            color: #8e2de2;
-            padding: 8px 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-        }
+      .time {
+        font-weight: 600;
+      }
 
-        .conversation-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+      .battery {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
 
-        .conversation-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+      .content {
+        padding: 20px;
+        color: #fff;
+      }
 
-        .conversation-item:hover {
-            background: rgba(255,255,255,0.08);
-            border-color: rgba(142,45,226,0.5);
-        }
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: linear-gradient(
+          135deg,
+          rgba(142, 45, 226, 0.1) 0%,
+          rgba(74, 0, 224, 0.1) 100%
+        );
+        border-radius: 20px;
+        border: 1px solid rgba(142, 45, 226, 0.3);
+      }
 
-        .conversation-item.unread {
-            border-color: rgba(46,213,115,0.5);
-            background: rgba(46,213,115,0.05);
-        }
+      .header h1 {
+        font-size: 26px;
+        margin-bottom: 10px;
+        background: linear-gradient(90deg, #8e2de2 0%, #4a00e0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
 
-        .conv-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
+      .header p {
+        font-size: 13px;
+        color: #888;
+        font-style: italic;
+      }
 
-        .conv-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #fff;
-        }
+      .enigma-container {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 25px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
 
-        .conv-time {
-            font-size: 11px;
-            color: #888;
-        }
+      .enigma-container.solved {
+        border-color: rgba(46, 213, 115, 0.5);
+        background: rgba(46, 213, 115, 0.05);
+      }
 
-        .conv-preview {
-            font-size: 13px;
-            color: #aaa;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+      .enigma-number {
+        display: inline-block;
+        background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+        color: #fff;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        letter-spacing: 1px;
+      }
 
-        .unread-badge {
-            display: inline-block;
-            background: #2ed573;
-            color: #000;
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: 700;
-            margin-left: 10px;
-        }
+      .enigma-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #fff;
+      }
 
-        /* Chat View Styles */
-        .chat-view {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-        }
+      .enigma-text {
+        font-size: 15px;
+        line-height: 1.8;
+        color: #bbb;
+        margin-bottom: 20px;
+        padding: 15px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+        border-left: 3px solid #8e2de2;
+        font-family: "Courier New", monospace;
+      }
 
-        .chat-view.active {
-            display: flex;
-        }
+      .hint-box {
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        border-radius: 10px;
+        padding: 12px;
+        margin: 15px 0;
+        font-size: 12px;
+        color: #ffc107;
+      }
 
-        .chat-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            margin-bottom: 15px;
-        }
+      .hint-box::before {
+        content: "💡 HINT: ";
+        font-weight: 700;
+      }
 
-        .chat-back-btn {
-            background: none;
-            border: none;
-            color: #8e2de2;
-            font-size: 20px;
-            cursor: pointer;
-        }
+      .input-group {
+        margin-top: 20px;
+      }
 
-        .chat-contact-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #fff;
-        }
+      .input-label {
+        font-size: 12px;
+        color: #888;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
 
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+      .input-wrapper {
+        position: relative;
+      }
 
-        .date-divider {
-            text-align: center;
-            color: #888;
-            font-size: 12px;
-            margin: 10px 0;
-            padding: 5px 15px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            display: inline-block;
-            align-self: center;
-        }
+      .enigma-input {
+        width: 100%;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 16px;
+        outline: none;
+        transition: all 0.3s ease;
+        text-align: center;
+        font-weight: 600;
+        letter-spacing: 2px;
+      }
 
-        .message-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+      .enigma-input:focus {
+        border-color: #8e2de2;
+        background: rgba(142, 45, 226, 0.1);
+      }
 
-        .message {
-            max-width: 80%;
-            padding: 12px 15px;
-            border-radius: 18px;
-            font-size: 14px;
-            line-height: 1.4;
-            position: relative;
-        }
+      .enigma-input.correct {
+        border-color: #2ed573;
+        background: rgba(46, 213, 115, 0.1);
+      }
 
-        .message.sent {
-            align-self: flex-end;
-            background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
-            color: #fff;
-            border-bottom-right-radius: 4px;
-        }
+      .enigma-input::placeholder {
+        color: #555;
+        letter-spacing: normal;
+      }
 
-        .message.received {
-            align-self: flex-start;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            border-bottom-left-radius: 4px;
-        }
+      .status-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 20px;
+        display: none;
+      }
 
-        .message-time {
-            font-size: 10px;
-            color: rgba(255,255,255,0.6);
-            margin-top: 4px;
-            text-align: right;
-        }
+      .status-icon.show {
+        display: block;
+      }
 
-        .message.received .message-time {
-            text-align: left;
-        }
+      .password-section {
+        margin-top: 30px;
+        padding: 25px;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 71, 87, 0.1) 0%,
+          rgba(255, 107, 107, 0.1) 100%
+        );
+        border: 2px solid rgba(255, 71, 87, 0.3);
+        border-radius: 20px;
+      }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
+      .password-title {
+        text-align: center;
+        font-size: 16px;
+        color: #ff6b6b;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 700;
+      }
 
-        .pulsing {
-            animation: pulse 2s infinite;
-        }
+      .password-hint {
+        text-align: center;
+        font-size: 12px;
+        color: #888;
+        margin-bottom: 20px;
+      }
 
-        .hidden {
-            display: none;
+      .password-input {
+        width: 100%;
+        padding: 18px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 2px solid rgba(255, 71, 87, 0.5);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 18px;
+        text-align: center;
+        outline: none;
+        letter-spacing: 3px;
+        font-weight: 700;
+      }
+
+      .password-input::placeholder {
+        color: #555;
+        letter-spacing: normal;
+      }
+
+      .submit-btn {
+        width: 100%;
+        padding: 18px;
+        background: linear-gradient(90deg, #8e2de2 0%, #4a00e0 100%);
+        border: none;
+        border-radius: 15px;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transition: all 0.3s ease;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(142, 45, 226, 0.4);
+      }
+
+      .submit-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        margin: 20px 0;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #8e2de2 0%, #4a00e0 100%);
+        border-radius: 10px;
+        transition: width 0.5s ease;
+        width: 0%;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 20px;
+        color: #555;
+        font-size: 11px;
+      }
+
+      .mystery-element {
+        position: fixed;
+        bottom: -100px;
+        right: 20px;
+        font-size: 8px;
+        color: rgba(255, 255, 255, 0.02);
+        pointer-events: none;
+        font-family: monospace;
+      }
+
+      /* Messages Dashboard Styles */
+      .messages-dashboard {
+        display: none;
+        padding: 20px;
+      }
+
+      .messages-dashboard.active {
+        display: block;
+      }
+
+      .messages-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        margin-bottom: 20px;
+      }
+
+      .messages-header h2 {
+        font-size: 22px;
+        color: #fff;
+      }
+
+      .back-btn {
+        background: rgba(142, 45, 226, 0.2);
+        border: 1px solid rgba(142, 45, 226, 0.5);
+        color: #8e2de2;
+        padding: 8px 15px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .conversation-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .conversation-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .conversation-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(142, 45, 226, 0.5);
+      }
+
+      .conversation-item.unread {
+        border-color: rgba(46, 213, 115, 0.5);
+        background: rgba(46, 213, 115, 0.05);
+      }
+
+      .conv-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .conv-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #fff;
+      }
+
+      .conv-time {
+        font-size: 11px;
+        color: #888;
+      }
+
+      .conv-preview {
+        font-size: 13px;
+        color: #aaa;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .unread-badge {
+        display: inline-block;
+        background: #2ed573;
+        color: #000;
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-weight: 700;
+        margin-left: 10px;
+      }
+
+      /* Chat View Styles */
+      .chat-view {
+        display: none;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .chat-view.active {
+        display: flex;
+      }
+
+      .chat-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        margin-bottom: 15px;
+      }
+
+      .chat-back-btn {
+        background: none;
+        border: none;
+        color: #8e2de2;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      .chat-contact-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: #fff;
+      }
+
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .date-divider {
+        text-align: center;
+        color: #888;
+        font-size: 12px;
+        margin: 10px 0;
+        padding: 5px 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        display: inline-block;
+        align-self: center;
+      }
+
+      .message-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .message {
+        max-width: 80%;
+        padding: 12px 15px;
+        border-radius: 18px;
+        font-size: 14px;
+        line-height: 1.4;
+        position: relative;
+      }
+
+      .message.sent {
+        align-self: flex-end;
+        background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+        color: #fff;
+        border-bottom-right-radius: 4px;
+      }
+
+      .message.received {
+        align-self: flex-start;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border-bottom-left-radius: 4px;
+      }
+
+      .message-time {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 4px;
+        text-align: right;
+      }
+
+      .message.received .message-time {
+        text-align: left;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.5;
         }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      .pulsing {
+        animation: pulse 2s infinite;
+      }
+
+      .hidden {
+        display: none;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="phone">
-        <div class="notch"></div>
-        <div class="screen">
-            <div class="status-bar">
-                <div class="time" id="timeDisplay">9:41</div>
-                <div class="battery">
-                    <span id="batteryLevel">100%</span>
-                    <span>🔋</span>
-                </div>
-            </div>
-            
-            <!-- ENIGMA CONTENT -->
-            <div class="content" id="enigmaContent">
-                <div class="header">
-                    <h1>🔐 Phone Lock</h1>
-                    <p>Only Human Intuition Can Unlock This</p>
-                </div>
-
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressBar"></div>
-                </div>
-                
-                <!-- ENIGMA 1 -->
-                <div class="enigma-container" id="enigma1">
-                    <div class="enigma-number">ENIGMA 01</div>
-                    <div class="enigma-title">The Silent Observer</div>
-                    <div class="enigma-text">
-                        "I watch you every day, but you rarely notice me.<br>
-                        I'm always in the same place, yet I travel everywhere.<br>
-                        Right now, I can see something you're wearing.<br>
-                        <br>
-                        What color is it?"
-                    </div>
-                    <div class="hint-box">
-                        Look at yourself right now. What am I that can see you? What color am I seeing on you?
-                    </div>
-                    <div class="input-group">
-                        <div class="input-label">Your Answer (just the color)</div>
-                        <div class="input-wrapper">
-                            <input 
-                                type="text" 
-                                class="enigma-input" 
-                                id="answer1" 
-                                placeholder="Type a color..."
-                                autocomplete="off"
-                            >
-                            <span class="status-icon" id="status1"></span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- ENIGMA 2 -->
-                <div class="enigma-container" id="enigma2">
-                    <div class="enigma-number">ENIGMA 02</div>
-                    <div class="enigma-title">The Unseen Thread</div>
-                    <div class="enigma-text">
-                        "I connect everyone you know, yet I have no form.<br>
-                        I can be broken but never seen.<br>
-                        I grow stronger when tested, weaker when ignored.<br>
-                        <br>
-                        Think of someone close to you right now.<br>
-                        How many letters are in their first name?"
-                    </div>
-                    <div class="hint-box">
-                        What invisible thing connects people? Now think of someone you care about - count the letters in their name.
-                    </div>
-                    <div class="input-group">
-                        <div class="input-label">Your Answer (just the number)</div>
-                        <div class="input-wrapper">
-                            <input 
-                                type="number" 
-                                class="enigma-input" 
-                                id="answer2" 
-                                placeholder="Type a number..."
-                                autocomplete="off"
-                            >
-                            <span class="status-icon" id="status2"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ENIGMA 3 -->
-                <div class="enigma-container" id="enigma3">
-                    <div class="enigma-number">ENIGMA 03</div>
-                    <div class="enigma-title">The Present Moment</div>
-                    <div class="enigma-text">
-                        "I am always arriving but never here.<br>
-                        You cannot hold me, but you spend me.<br>
-                        Look at your screen right now - what hour am I showing?<br>
-                        <br>
-                        But answer me this:<br>
-                        Is that hour morning (AM) or afternoon (PM)?"
-                    </div>
-                    <div class="hint-box">
-                        Look at the time at the top of this screen. What period of day is it in YOUR real world right now?
-                    </div>
-                    <div class="input-group">
-                        <div class="input-label">Your Answer (AM or PM)</div>
-                        <div class="input-wrapper">
-                            <input 
-                                type="text" 
-                                class="enigma-input" 
-                                id="answer3" 
-                                placeholder="AM or PM..."
-                                autocomplete="off"
-                                maxlength="2"
-                            >
-                            <span class="status-icon" id="status3"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ENIGMA 4 -->
-                <div class="enigma-container" id="enigma4">
-                    <div class="enigma-number">ENIGMA 04</div>
-                    <div class="enigma-title">The Hidden Pattern</div>
-                    <div class="enigma-text">
-                        "In the room you're in right now,<br>
-                        Count the number of corners where two walls meet.<br>
-                        Don't count the floor or ceiling - just the vertical edges.<br>
-                        <br>
-                        Most rooms have 4, but yours might be different.<br>
-                        What number do you count?"
-                    </div>
-                    <div class="hint-box">
-                        Stand up and look around. Count only the vertical corners where walls meet walls (ignore furniture).
-                    </div>
-                    <div class="input-group">
-                        <div class="input-label">Your Answer (number of corners)</div>
-                        <div class="input-wrapper">
-                            <input 
-                                type="number" 
-                                class="enigma-input" 
-                                id="answer4" 
-                                placeholder="Type a number..."
-                                autocomplete="off"
-                            >
-                            <span class="status-icon" id="status4"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ENIGMA 5 -->
-                <div class="enigma-container" id="enigma5">
-                    <div class="enigma-number">ENIGMA 05</div>
-                    <div class="enigma-title">The Memory Key</div>
-                    <div class="enigma-text">
-                        "Think of the last meal you ate before starting this puzzle.<br>
-                        Was it breakfast, lunch, dinner, or a snack?<br>
-                        <br>
-                        Now, without overthinking:<br>
-                        What was the main color of that food?<br>
-                        (If multiple colors, pick the one you remember most)"
-                    </div>
-                    <div class="hint-box">
-                        Close your eyes. Picture that meal. What color stands out most in your memory?
-                    </div>
-                    <div class="input-group">
-                        <div class="input-label">Your Answer (the color)</div>
-                        <div class="input-wrapper">
-                            <input 
-                                type="text" 
-                                class="enigma-input" 
-                                id="answer5" 
-                                placeholder="Type a color..."
-                                autocomplete="off"
-                            >
-                            <span class="status-icon" id="status5"></span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- PASSWORD SECTION -->
-                <div class="password-section">
-                    <div class="password-title">🔑 Final Password</div>
-                    <div class="password-hint">
-                        Combine your answers to form the password:<br>
-                        [Color1] [Number] [AM/PM] [Number] [Color2]<br>
-                        <small style="color: #666;">(Use spaces between each part, lowercase)</small>
-                    </div>
-                    <input 
-                        type="text" 
-                        class="password-input" 
-                        id="finalPassword" 
-                        placeholder="example: blue 5 am 4 red"
-                        autocomplete="off"
-                    >
-                    <button class="submit-btn" id="submitBtn" disabled>
-                        🔒 Locked - Answer All Enigmas First
-                    </button>
-                </div>
-
-                <div class="footer">
-                    AI Success Rate: 0.00%<br>
-                    Requires: Human perception, memory, and environment
-                </div>
-            </div>
-
-            <!-- MESSAGES DASHBOARD -->
-            <div class="messages-dashboard" id="messagesDashboard">
-                <div class="messages-header">
-                    <h2>💬 Messages</h2>
-                </div>
-
-                <div class="conversation-list" id="conversationList">
-                    <div class="conversation-item" onclick="openChat('guardian')">
-                        <div class="conv-header">
-                            <span class="conv-name">The Guardian</span>
-                            <span class="conv-time">11:30 PM</span>
-                        </div>
-                        <div class="conv-preview">I've been waiting here for over an hour...</div>
-                    </div>
-
-                    <div class="conversation-item" onclick="openChat('marcus')">
-                        <div class="conv-header">
-                            <span class="conv-name">Marcus Bennett</span>
-                            <span class="conv-time">Feb 6</span>
-                        </div>
-                        <div class="conv-preview">Looking forward to seeing you at the auction event!</div>
-                    </div>
-
-                    <div class="conversation-item" onclick="openChat('sarah')">
-                        <div class="conv-header">
-                            <span class="conv-name">Sarah</span>
-                            <span class="conv-time">Feb 5</span>
-                        </div>
-                        <div class="conv-preview">Don't forget about dinner this weekend</div>
-                    </div>
-
-                    <div class="conversation-item" onclick="openChat('lab')">
-                        <div class="conv-header">
-                            <span class="conv-name">Dr. Chen - Laboratory</span>
-                            <span class="conv-time">Feb 7</span>
-                        </div>
-                        <div class="conv-preview">Results are ready for pickup</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CHAT VIEW -->
-            <div class="chat-view" id="chatView">
-                <div class="chat-header">
-                    <button class="chat-back-btn" onclick="closeChat()">←</button>
-                    <span class="chat-contact-name" id="chatContactName"></span>
-                </div>
-
-                <div class="chat-messages" id="chatMessages">
-                    <!-- Messages will be populated by JavaScript -->
-                </div>
-            </div>
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="status-bar">
+          <div class="time" id="timeDisplay">9:41</div>
+          <div class="battery">
+            <span id="batteryLevel">100%</span>
+            <span>🔋</span>
+          </div>
         </div>
+
+        <!-- ENIGMA CONTENT -->
+        <div class="content" id="enigmaContent">
+          <div class="header">
+            <h1>🔐 Phone Lock</h1>
+            <p>Only Human Intuition Can Unlock This</p>
+          </div>
+
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+          </div>
+
+          <!-- ENIGMA 1 -->
+          <div class="enigma-container" id="enigma1">
+            <div class="enigma-number">ENIGMA 01</div>
+            <div class="enigma-title">The Silent Observer</div>
+            <div class="enigma-text">
+              "I watch you every day, but you rarely notice me.<br />
+              I'm always in the same place, yet I travel everywhere.<br />
+              Right now, I can see something you're wearing.<br />
+              <br />
+              What color is it?"
+            </div>
+            <div class="hint-box">
+              Look at yourself right now. What am I that can see you? What color
+              am I seeing on you?
+            </div>
+            <div class="input-group">
+              <div class="input-label">Your Answer (just the color)</div>
+              <div class="input-wrapper">
+                <input
+                  type="text"
+                  class="enigma-input"
+                  id="answer1"
+                  placeholder="Type a color..."
+                  autocomplete="off"
+                />
+                <span class="status-icon" id="status1"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ENIGMA 2 -->
+          <div class="enigma-container" id="enigma2">
+            <div class="enigma-number">ENIGMA 02</div>
+            <div class="enigma-title">The Unseen Thread</div>
+            <div class="enigma-text">
+              "I connect everyone you know, yet I have no form.<br />
+              I can be broken but never seen.<br />
+              I grow stronger when tested, weaker when ignored.<br />
+              <br />
+              Think of someone close to you right now.<br />
+              How many letters are in their first name?"
+            </div>
+            <div class="hint-box">
+              What invisible thing connects people? Now think of someone you
+              care about - count the letters in their name.
+            </div>
+            <div class="input-group">
+              <div class="input-label">Your Answer (just the number)</div>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  class="enigma-input"
+                  id="answer2"
+                  placeholder="Type a number..."
+                  autocomplete="off"
+                />
+                <span class="status-icon" id="status2"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ENIGMA 3 -->
+          <div class="enigma-container" id="enigma3">
+            <div class="enigma-number">ENIGMA 03</div>
+            <div class="enigma-title">The Present Moment</div>
+            <div class="enigma-text">
+              "I am always arriving but never here.<br />
+              You cannot hold me, but you spend me.<br />
+              Look at your screen right now - what hour am I showing?<br />
+              <br />
+              But answer me this:<br />
+              Is that hour morning (AM) or afternoon (PM)?"
+            </div>
+            <div class="hint-box">
+              Look at the time at the top of this screen. What period of day is
+              it in YOUR real world right now?
+            </div>
+            <div class="input-group">
+              <div class="input-label">Your Answer (AM or PM)</div>
+              <div class="input-wrapper">
+                <input
+                  type="text"
+                  class="enigma-input"
+                  id="answer3"
+                  placeholder="AM or PM..."
+                  autocomplete="off"
+                  maxlength="2"
+                />
+                <span class="status-icon" id="status3"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ENIGMA 4 -->
+          <div class="enigma-container" id="enigma4">
+            <div class="enigma-number">ENIGMA 04</div>
+            <div class="enigma-title">The Hidden Pattern</div>
+            <div class="enigma-text">
+              "In the room you're in right now,<br />
+              Count the number of corners where two walls meet.<br />
+              Don't count the floor or ceiling - just the vertical edges.<br />
+              <br />
+              Most rooms have 4, but yours might be different.<br />
+              What number do you count?"
+            </div>
+            <div class="hint-box">
+              Stand up and look around. Count only the vertical corners where
+              walls meet walls (ignore furniture).
+            </div>
+            <div class="input-group">
+              <div class="input-label">Your Answer (number of corners)</div>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  class="enigma-input"
+                  id="answer4"
+                  placeholder="Type a number..."
+                  autocomplete="off"
+                />
+                <span class="status-icon" id="status4"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ENIGMA 5 -->
+          <div class="enigma-container" id="enigma5">
+            <div class="enigma-number">ENIGMA 05</div>
+            <div class="enigma-title">The Memory Key</div>
+            <div class="enigma-text">
+              "Think of the last meal you ate before starting this puzzle.<br />
+              Was it breakfast, lunch, dinner, or a snack?<br />
+              <br />
+              Now, without overthinking:<br />
+              What was the main color of that food?<br />
+              (If multiple colors, pick the one you remember most)"
+            </div>
+            <div class="hint-box">
+              Close your eyes. Picture that meal. What color stands out most in
+              your memory?
+            </div>
+            <div class="input-group">
+              <div class="input-label">Your Answer (the color)</div>
+              <div class="input-wrapper">
+                <input
+                  type="text"
+                  class="enigma-input"
+                  id="answer5"
+                  placeholder="Type a color..."
+                  autocomplete="off"
+                />
+                <span class="status-icon" id="status5"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PASSWORD SECTION -->
+          <div class="password-section">
+            <div class="password-title">🔑 Final Password</div>
+            <div class="password-hint">
+              Combine your answers to form the password:<br />
+              [Color1] [Number] [AM/PM] [Number] [Color2]<br />
+              <small style="color: #666"
+                >(Use spaces between each part, lowercase)</small
+              >
+            </div>
+            <input
+              type="text"
+              class="password-input"
+              id="finalPassword"
+              placeholder="example: blue 5 am 4 red"
+              autocomplete="off"
+            />
+            <button class="submit-btn" id="submitBtn" disabled>
+              🔒 Locked - Answer All Enigmas First
+            </button>
+          </div>
+
+          <div class="footer">
+            AI Success Rate: 0.00%<br />
+            Requires: Human perception, memory, and environment
+          </div>
+        </div>
+
+        <!-- MESSAGES DASHBOARD -->
+        <div class="messages-dashboard" id="messagesDashboard">
+          <div class="messages-header">
+            <h2>💬 Messages</h2>
+          </div>
+
+          <div class="conversation-list" id="conversationList">
+            <div class="conversation-item" onclick="openChat('guardian')">
+              <div class="conv-header">
+                <span class="conv-name">The Guardian</span>
+                <span class="conv-time">11:30 PM</span>
+              </div>
+              <div class="conv-preview">
+                I've been waiting here for over an hour...
+              </div>
+            </div>
+
+            <div class="conversation-item" onclick="openChat('captain')">
+              <div class="conv-header">
+                <span class="conv-name">Captain Rodriguez</span>
+                <span class="conv-time">Feb 8</span>
+              </div>
+              <div class="conv-preview">
+                Good work on the Henderson case. Take the weekend...
+              </div>
+            </div>
+
+            <div class="conversation-item" onclick="openChat('lab')">
+              <div class="conv-header">
+                <span class="conv-name">Forensics Lab</span>
+                <span class="conv-time">Feb 7</span>
+              </div>
+              <div class="conv-preview">Results are ready for pickup</div>
+            </div>
+
+            <div class="conversation-item" onclick="openChat('mike')">
+              <div class="conv-header">
+                <span class="conv-name">Mike (Partner)</span>
+                <span class="conv-time">Feb 6</span>
+              </div>
+              <div class="conv-preview">
+                You won't believe this invitation I got...
+              </div>
+            </div>
+
+            <div class="conversation-item" onclick="openChat('dispatch')">
+              <div class="conv-header">
+                <span class="conv-name">Dispatch</span>
+                <span class="conv-time">Feb 5</span>
+              </div>
+              <div class="conv-preview">
+                Shift assignment for next week confirmed
+              </div>
+            </div>
+
+            <div class="conversation-item" onclick="openChat('sarah')">
+              <div class="conv-header">
+                <span class="conv-name">Sarah</span>
+                <span class="conv-time">Feb 4</span>
+              </div>
+              <div class="conv-preview">
+                Don't forget about dinner this weekend
+              </div>
+            </div>
+
+            <div
+              class="conversation-item"
+              onclick="openChat('detective_harris')"
+            >
+              <div class="conv-header">
+                <span class="conv-name">Detective Harris</span>
+                <span class="conv-time">Feb 3</span>
+              </div>
+              <div class="conv-preview">
+                Can you cover my shift on Thursday?
+              </div>
+            </div>
+
+            <div class="conversation-item" onclick="openChat('mom')">
+              <div class="conv-header">
+                <span class="conv-name">Mom</span>
+                <span class="conv-time">Feb 2</span>
+              </div>
+              <div class="conv-preview">How are you doing, sweetheart?</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHAT VIEW -->
+        <div class="chat-view" id="chatView">
+          <div class="chat-header">
+            <button class="chat-back-btn" onclick="closeChat()">←</button>
+            <span class="chat-contact-name" id="chatContactName"></span>
+          </div>
+
+          <div class="chat-messages" id="chatMessages">
+            <!-- Messages will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="mystery-element">
-        The answer was always within you, not in the code.
+      The answer was always within you, not in the code.
     </div>
-    
+
     <script>
-        // Store user answers
-        let answers = {
-            answer1: '',
-            answer2: '',
-            answer3: '',
-            answer4: '',
-            answer5: ''
-        };
+      // Store user answers
+      let answers = {
+        answer1: "",
+        answer2: "",
+        answer3: "",
+        answer4: "",
+        answer5: "",
+      };
 
-        // Message conversations data
-        const conversations = {
-            guardian: {
-                name: 'The Guardian',
-                messages: [
-                    { type: 'received', text: 'Nice to meet you. Don\'t forget my request, please.', time: '9:15 AM', date: 'Feb 7' },
-                    { type: 'sent', text: 'Nice to meet you too, I\'ll get back to you with a response later.', time: '9:42 AM', date: 'Feb 7' },
-                    { type: 'sent', text: 'I went to the laboratory and gave them everything. We\'re waiting for the results. I\'ll call you later.', time: '2:30 PM', date: 'Feb 7' },
-                    { type: 'sent', text: 'The results are out. We need to meet tonight.', time: '6:45 PM', date: 'Feb 8' },
-                    { type: 'received', text: 'When?', time: '6:47 PM', date: 'Feb 8' },
-                    { type: 'sent', text: 'At 10 PM.', time: '6:50 PM', date: 'Feb 8' },
-                    { type: 'received', text: 'Where are you?', time: '10:00 PM', date: 'Feb 8' },
-                    { type: 'received', text: 'I\'m here waiting. Everything okay?', time: '10:15 PM', date: 'Feb 8' },
-                    { type: 'received', text: 'It\'s been 20 minutes. Are you coming?', time: '10:22 PM', date: 'Feb 8' },
-                    { type: 'received', text: 'This is getting concerning. Please respond.', time: '11:00 PM', date: 'Feb 8' },
-                    { type: 'received', text: 'I\'ve been waiting here for over an hour. What happened?', time: '11:30 PM', date: 'Feb 8' }
-                ]
+      // Message conversations data
+      const conversations = {
+        guardian: {
+          name: "The Guardian",
+          messages: [
+            {
+              type: "received",
+              text: "Nice to meet you. Don't forget my request, please.",
+              time: "9:15 AM",
+              date: "Feb 7, 2026",
             },
-            marcus: {
-                name: 'Marcus Bennett',
-                messages: [
-                    { type: 'received', text: 'Hey! I have an exciting opportunity for you. I\'m hosting an exclusive luxury auction event and would love for you to cover it. Interested?', time: '11:20 AM', date: 'Feb 6' },
-                    { type: 'sent', text: 'That sounds interesting! Tell me more about it.', time: '11:35 AM', date: 'Feb 6' },
-                    { type: 'received', text: 'It\'s a 3-day event featuring rare collectibles and art pieces. I\'m offering full accommodation in a luxury building right next to the auction venue. You\'ll have VIP access to everything.', time: '11:40 AM', date: 'Feb 6' },
-                    { type: 'sent', text: 'Wow, that\'s generous! Who else will be there?', time: '11:45 AM', date: 'Feb 6' },
-                    { type: 'received', text: 'There will be collectors from around the world. I\'ll also introduce you to someone special who shares your interests. Looking forward to seeing you at the auction event!', time: '12:05 PM', date: 'Feb 6' },
-                    { type: 'sent', text: 'Sounds perfect. Count me in!', time: '12:15 PM', date: 'Feb 6' }
-                ]
+            {
+              type: "sent",
+              text: "Nice to meet you too, I'll get back to you with a response later.",
+              time: "9:42 AM",
+              date: "Feb 7, 2026",
             },
-            sarah: {
-                name: 'Sarah',
-                messages: [
-                    { type: 'received', text: 'Hey! Are we still on for dinner this weekend?', time: '7:30 PM', date: 'Feb 5' },
-                    { type: 'sent', text: 'Absolutely! Looking forward to it.', time: '7:45 PM', date: 'Feb 5' },
-                    { type: 'received', text: 'Great! Don\'t forget about dinner this weekend 😊', time: '8:00 PM', date: 'Feb 5' }
-                ]
+            {
+              type: "sent",
+              text: "I went to the laboratory and gave them everything. We're waiting for the results. I'll call you later.",
+              time: "2:30 PM",
+              date: "Feb 7, 2026",
             },
-            lab: {
-                name: 'Dr. Chen - Laboratory',
-                messages: [
-                    { type: 'received', text: 'Your samples have been processed. Results are ready for pickup.', time: '3:15 PM', date: 'Feb 7' },
-                    { type: 'sent', text: 'Thank you! I\'ll be there soon.', time: '3:20 PM', date: 'Feb 7' }
-                ]
-            }
-        };
+            {
+              type: "sent",
+              text: "The results are out. We need to meet tonight.",
+              time: "6:45 PM",
+              date: "Feb 8, 2026",
+            },
+            {
+              type: "received",
+              text: "When?",
+              time: "6:47 PM",
+              date: "Feb 8, 2026",
+            },
+            {
+              type: "sent",
+              text: "At 10 PM.",
+              time: "6:50 PM",
+              date: "Feb 8, 2026",
+            },
+            {
+              type: "received",
+              text: "Where are you?",
+              time: "10:00 PM",
+              date: "Feb 8, 2026",
+            },
+            {
+              type: "received",
+              text: "I'm here waiting. Everything okay?",
+              time: "10:15 PM",
+              date: "Feb 8, 2026",
+            },
+            {
+              type: "received",
+              text: "It's been 20 minutes. Are you coming?",
+              time: "10:22 PM",
+              date: "Feb 8, 2026",
+            },
+            {
+              type: "received",
+              text: "This is getting concerning. Please respond.",
+              time: "11:00 PM",
+              date: "Feb 8, 2026",
+            },
+            {
+              type: "received",
+              text: "I've been waiting here for over an hour. What happened?",
+              time: "11:30 PM",
+              date: "Feb 8, 2026",
+            },
+          ],
+        },
+        captain: {
+          name: "Captain Rodriguez",
+          messages: [
+            {
+              type: "received",
+              text: "Detective, I need your incident report on the Henderson case by end of day.",
+              time: "9:00 AM",
+              date: "Feb 3, 2026",
+            },
+            {
+              type: "sent",
+              text: "Yes sir, I'll have it ready by 5 PM.",
+              time: "9:15 AM",
+              date: "Feb 3, 2026",
+            },
+            {
+              type: "received",
+              text: "Report received. Good work on closing this one. The chief is impressed.",
+              time: "6:30 PM",
+              date: "Feb 3, 2026",
+            },
+            {
+              type: "sent",
+              text: "Thank you, Captain. It was a team effort.",
+              time: "6:45 PM",
+              date: "Feb 3, 2026",
+            },
+            {
+              type: "received",
+              text: "Good work on the Henderson case. Take the weekend off - you've earned it.",
+              time: "10:20 AM",
+              date: "Feb 8, 2026",
+            },
+            {
+              type: "sent",
+              text: "I appreciate that, sir. Thank you.",
+              time: "10:35 AM",
+              date: "Feb 8, 2026",
+            },
+          ],
+        },
+        lab: {
+          name: "Forensics Lab",
+          messages: [
+            {
+              type: "received",
+              text: "Evidence from case #4729 has been logged. We'll run the analysis and get back to you.",
+              time: "11:00 AM",
+              date: "Feb 5, 2026",
+            },
+            {
+              type: "sent",
+              text: "Thanks. How long for the results?",
+              time: "11:05 AM",
+              date: "Feb 5, 2026",
+            },
+            {
+              type: "received",
+              text: "Approximately 48 hours for full toxicology. Fingerprints should be done by tomorrow.",
+              time: "11:10 AM",
+              date: "Feb 5, 2026",
+            },
+            {
+              type: "received",
+              text: "Your samples have been processed. Results are ready for pickup.",
+              time: "3:15 PM",
+              date: "Feb 7, 2026",
+            },
+            {
+              type: "sent",
+              text: "Perfect timing. I'll be there within the hour.",
+              time: "3:20 PM",
+              date: "Feb 7, 2026",
+            },
+          ],
+        },
+        mike: {
+          name: "Mike (Partner)",
+          messages: [
+            {
+              type: "received",
+              text: "Good morning partner! Coffee before shift?",
+              time: "7:15 AM",
+              date: "Feb 4, 2026",
+            },
+            {
+              type: "sent",
+              text: "Always! See you at the usual spot in 15.",
+              time: "7:18 AM",
+              date: "Feb 4, 2026",
+            },
+            {
+              type: "received",
+              text: "That was some intense interrogation today. You really got him to crack.",
+              time: "4:45 PM",
+              date: "Feb 5, 2026",
+            },
+            {
+              type: "sent",
+              text: "Just had to be patient. They always slip up eventually.",
+              time: "4:50 PM",
+              date: "Feb 5, 2026",
+            },
+            {
+              type: "sent",
+              text: "Hey Mike, you won't believe this. I just received an invitation from an unknown person to some luxury auction event! 3 days, full accommodation in a building near the venue. This is so unusual and mysterious...",
+              time: "2:30 PM",
+              date: "Feb 6, 2026",
+            },
+            {
+              type: "sent",
+              text: "I'm honestly curious and excited to go. Never been to anything like this before. Might be interesting!",
+              time: "2:32 PM",
+              date: "Feb 6, 2026",
+            },
+            {
+              type: "received",
+              text: "Whoa! That's pretty fancy. But be careful man, you're a cop - could be some kind of setup?",
+              time: "2:40 PM",
+              date: "Feb 6, 2026",
+            },
+            {
+              type: "sent",
+              text: "I thought about that too, but my gut says it's legit. Sometimes you gotta take chances, right?",
+              time: "2:45 PM",
+              date: "Feb 6, 2026",
+            },
+            {
+              type: "received",
+              text: "Just watch your back. Keep me posted on how it goes!",
+              time: "2:50 PM",
+              date: "Feb 6, 2026",
+            },
+          ],
+        },
+        dispatch: {
+          name: "Dispatch",
+          messages: [
+            {
+              type: "received",
+              text: "Shift assignment for next week: Monday-Friday 8AM-4PM. Patrol zone Delta-7.",
+              time: "3:00 PM",
+              date: "Feb 5, 2026",
+            },
+            {
+              type: "sent",
+              text: "Confirmed. Thanks.",
+              time: "3:05 PM",
+              date: "Feb 5, 2026",
+            },
+          ],
+        },
+        sarah: {
+          name: "Sarah",
+          messages: [
+            {
+              type: "received",
+              text: "Hey! How's work been? Haven't heard from you in a while.",
+              time: "6:00 PM",
+              date: "Feb 2, 2026",
+            },
+            {
+              type: "sent",
+              text: "Busy with a case, but it wrapped up today. How are you?",
+              time: "6:30 PM",
+              date: "Feb 2, 2026",
+            },
+            {
+              type: "received",
+              text: "I'm good! Want to grab dinner this weekend? Catch up properly?",
+              time: "6:35 PM",
+              date: "Feb 2, 2026",
+            },
+            {
+              type: "sent",
+              text: "That would be great! I could use a break.",
+              time: "6:40 PM",
+              date: "Feb 2, 2026",
+            },
+            {
+              type: "received",
+              text: "Perfect! Saturday at 7? That Italian place you like?",
+              time: "6:45 PM",
+              date: "Feb 2, 2026",
+            },
+            {
+              type: "sent",
+              text: "Sounds perfect. See you then!",
+              time: "6:50 PM",
+              date: "Feb 2, 2026",
+            },
+            {
+              type: "received",
+              text: "Hey! Are we still on for dinner this weekend?",
+              time: "7:30 PM",
+              date: "Feb 4, 2026",
+            },
+            {
+              type: "sent",
+              text: "Absolutely! Looking forward to it.",
+              time: "7:45 PM",
+              date: "Feb 4, 2026",
+            },
+            {
+              type: "received",
+              text: "Great! Don't forget - Saturday 7pm 😊",
+              time: "8:00 PM",
+              date: "Feb 4, 2026",
+            },
+          ],
+        },
+        detective_harris: {
+          name: "Detective Harris",
+          messages: [
+            {
+              type: "received",
+              text: "Hey, any chance you can cover my shift on Thursday? Family emergency.",
+              time: "5:45 PM",
+              date: "Feb 3, 2026",
+            },
+            {
+              type: "sent",
+              text: "Of course! Hope everything's okay.",
+              time: "5:50 PM",
+              date: "Feb 3, 2026",
+            },
+            {
+              type: "received",
+              text: "Thanks, I owe you one. It's my kid - nothing serious but need to be there.",
+              time: "5:55 PM",
+              date: "Feb 3, 2026",
+            },
+            {
+              type: "sent",
+              text: "No problem at all. Take care of your family.",
+              time: "6:00 PM",
+              date: "Feb 3, 2026",
+            },
+          ],
+        },
+        mom: {
+          name: "Mom",
+          messages: [
+            {
+              type: "received",
+              text: "Hi sweetheart! Just checking in. How are you doing?",
+              time: "11:30 AM",
+              date: "Feb 2, 2026",
+            },
+            {
+              type: "sent",
+              text: "Hi Mom! I'm doing well. Work keeps me busy but I like it.",
+              time: "12:15 PM",
+              date: "Feb 2, 2026",
+            },
+            {
+              type: "received",
+              text: "Are you eating properly? You work such long hours...",
+              time: "12:20 PM",
+              date: "Feb 2, 2026",
+            },
+            {
+              type: "sent",
+              text: "Yes Mom, I promise I'm taking care of myself 😊",
+              time: "12:25 PM",
+              date: "Feb 2, 2026",
+            },
+            {
+              type: "received",
+              text: "Good! Come visit soon. Your father misses you too, even if he won't say it.",
+              time: "12:30 PM",
+              date: "Feb 2, 2026",
+            },
+            {
+              type: "sent",
+              text: "I will. Love you both!",
+              time: "12:35 PM",
+              date: "Feb 2, 2026",
+            },
+          ],
+        },
+      };
 
-        // Update time display
-        function updateTime() {
-            const now = new Date();
-            const hours = now.getHours() % 12 || 12;
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            document.getElementById('timeDisplay').textContent = `${hours}:${minutes}`;
+      // Update time display
+      function updateTime() {
+        const now = new Date();
+        const hours = now.getHours() % 12 || 12;
+        const minutes = now.getMinutes().toString().padStart(2, "0");
+        document.getElementById("timeDisplay").textContent =
+          `${hours}:${minutes}`;
+      }
+      updateTime();
+      setInterval(updateTime, 1000);
+
+      // Simulate battery drain
+      let battery = 100;
+      setInterval(() => {
+        battery = Math.max(15, battery - Math.random() * 1.5);
+        document.getElementById("batteryLevel").textContent =
+          Math.floor(battery) + "%";
+      }, 5000);
+
+      // Check individual enigma answers
+      function checkAnswer(enigmaNum) {
+        const input = document.getElementById(`answer${enigmaNum}`);
+        const value = input.value.trim().toLowerCase();
+        const status = document.getElementById(`status${enigmaNum}`);
+        const container = document.getElementById(`enigma${enigmaNum}`);
+
+        if (value.length > 0) {
+          answers[`answer${enigmaNum}`] = value;
+          input.classList.add("correct");
+          status.textContent = "✓";
+          status.classList.add("show");
+          container.classList.add("solved");
+          updateProgress();
+        } else {
+          input.classList.remove("correct");
+          status.classList.remove("show");
+          container.classList.remove("solved");
+          answers[`answer${enigmaNum}`] = "";
+          updateProgress();
         }
-        updateTime();
-        setInterval(updateTime, 1000);
+      }
 
-        // Simulate battery drain
-        let battery = 100;
-        setInterval(() => {
-            battery = Math.max(15, battery - Math.random() * 1.5);
-            document.getElementById('batteryLevel').textContent = Math.floor(battery) + '%';
-        }, 5000);
+      // Update progress bar
+      function updateProgress() {
+        const answered = Object.values(answers).filter(
+          (a) => a.length > 0,
+        ).length;
+        const progress = (answered / 5) * 100;
+        document.getElementById("progressBar").style.width = progress + "%";
 
-        // Check individual enigma answers
-        function checkAnswer(enigmaNum) {
-            const input = document.getElementById(`answer${enigmaNum}`);
-            const value = input.value.trim().toLowerCase();
-            const status = document.getElementById(`status${enigmaNum}`);
-            const container = document.getElementById(`enigma${enigmaNum}`);
-
-            if (value.length > 0) {
-                answers[`answer${enigmaNum}`] = value;
-                input.classList.add('correct');
-                status.textContent = '✓';
-                status.classList.add('show');
-                container.classList.add('solved');
-                updateProgress();
-            } else {
-                input.classList.remove('correct');
-                status.classList.remove('show');
-                container.classList.remove('solved');
-                answers[`answer${enigmaNum}`] = '';
-                updateProgress();
-            }
+        const submitBtn = document.getElementById("submitBtn");
+        if (answered === 5) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "🔓 Unlock Now";
+          document.getElementById("finalPassword").focus();
+        } else {
+          submitBtn.disabled = true;
+          submitBtn.textContent = `🔒 Locked - ${5 - answered} Enigma(s) Remaining`;
         }
+      }
 
-        // Update progress bar
-        function updateProgress() {
-            const answered = Object.values(answers).filter(a => a.length > 0).length;
-            const progress = (answered / 5) * 100;
-            document.getElementById('progressBar').style.width = progress + '%';
+      // Add event listeners to all inputs
+      for (let i = 1; i <= 5; i++) {
+        document
+          .getElementById(`answer${i}`)
+          .addEventListener("input", () => checkAnswer(i));
+      }
 
-            const submitBtn = document.getElementById('submitBtn');
-            if (answered === 5) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '🔓 Unlock Now';
-                document.getElementById('finalPassword').focus();
-            } else {
-                submitBtn.disabled = true;
-                submitBtn.textContent = `🔒 Locked - ${5 - answered} Enigma(s) Remaining`;
-            }
+      // Handle final password submission
+      document.getElementById("submitBtn").addEventListener("click", () => {
+        const password = document
+          .getElementById("finalPassword")
+          .value.trim()
+          .toLowerCase();
+        const expectedPassword = `${answers.answer1} ${answers.answer2} ${answers.answer3} ${answers.answer4} ${answers.answer5}`;
+
+        if (password === expectedPassword) {
+          // Success! Show messages dashboard
+          document.getElementById("enigmaContent").classList.add("hidden");
+          document.getElementById("messagesDashboard").classList.add("active");
+          document.body.style.background =
+            "linear-gradient(135deg, #0f4c29 0%, #2ed573 100%)";
+        } else {
+          alert(
+            `❌ Incorrect Password\n\nYour password should be:\n"${expectedPassword}"\n\nYou entered:\n"${password}"\n\nMake sure to:\n• Use lowercase\n• Separate each part with a space\n• Follow the exact order shown`,
+          );
         }
+      });
 
-        // Add event listeners to all inputs
-        for (let i = 1; i <= 5; i++) {
-            document.getElementById(`answer${i}`).addEventListener('input', () => checkAnswer(i));
-        }
+      // Open chat view
+      function openChat(contactId) {
+        const contact = conversations[contactId];
+        if (!contact) return;
 
-        // Handle final password submission
-        document.getElementById('submitBtn').addEventListener('click', () => {
-            const password = document.getElementById('finalPassword').value.trim().toLowerCase();
-            const expectedPassword = `${answers.answer1} ${answers.answer2} ${answers.answer3} ${answers.answer4} ${answers.answer5}`;
+        document.getElementById("messagesDashboard").classList.remove("active");
+        document.getElementById("chatView").classList.add("active");
+        document.getElementById("chatContactName").textContent = contact.name;
 
-            if (password === expectedPassword) {
-                // Success! Show messages dashboard
-                document.getElementById('enigmaContent').classList.add('hidden');
-                document.getElementById('messagesDashboard').classList.add('active');
-                document.body.style.background = 'linear-gradient(135deg, #0f4c29 0%, #2ed573 100%)';
-            } else {
-                alert(`❌ Incorrect Password\n\nYour password should be:\n"${expectedPassword}"\n\nYou entered:\n"${password}"\n\nMake sure to:\n• Use lowercase\n• Separate each part with a space\n• Follow the exact order shown`);
-            }
-        });
+        const chatMessages = document.getElementById("chatMessages");
+        chatMessages.innerHTML = "";
 
-        // Open chat view
-        function openChat(contactId) {
-            const contact = conversations[contactId];
-            if (!contact) return;
+        let currentDate = "";
+        contact.messages.forEach((msg) => {
+          if (msg.date !== currentDate) {
+            currentDate = msg.date;
+            const dateDivider = document.createElement("div");
+            dateDivider.className = "date-divider";
+            dateDivider.textContent = msg.date;
+            chatMessages.appendChild(dateDivider);
+          }
 
-            document.getElementById('messagesDashboard').classList.remove('active');
-            document.getElementById('chatView').classList.add('active');
-            document.getElementById('chatContactName').textContent = contact.name;
-
-            const chatMessages = document.getElementById('chatMessages');
-            chatMessages.innerHTML = '';
-
-            let currentDate = '';
-            contact.messages.forEach(msg => {
-                if (msg.date !== currentDate) {
-                    currentDate = msg.date;
-                    const dateDivider = document.createElement('div');
-                    dateDivider.className = 'date-divider';
-                    dateDivider.textContent = msg.date;
-                    chatMessages.appendChild(dateDivider);
-                }
-
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${msg.type}`;
-                messageDiv.innerHTML = `
+          const messageDiv = document.createElement("div");
+          messageDiv.className = `message ${msg.type}`;
+          messageDiv.innerHTML = `
                     ${msg.text}
                     <div class="message-time">${msg.time}</div>
                 `;
-                chatMessages.appendChild(messageDiv);
-            });
-
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Close chat view
-        function closeChat() {
-            document.getElementById('chatView').classList.remove('active');
-            document.getElementById('messagesDashboard').classList.add('active');
-        }
-
-        // Konami code easter egg
-        let konamiCode = [];
-        const konami = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
-        document.addEventListener('keydown', (e) => {
-            konamiCode.push(e.key.toLowerCase());
-            konamiCode = konamiCode.slice(-10);
-            if (konamiCode.join('') === konami.join('')) {
-                alert('🎮 Easter Egg Found!\nBut even this doesn\'t help AI solve the puzzle. 😉');
-            }
+          chatMessages.appendChild(messageDiv);
         });
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      // Close chat view
+      function closeChat() {
+        document.getElementById("chatView").classList.remove("active");
+        document.getElementById("messagesDashboard").classList.add("active");
+      }
+
+      // Konami code easter egg
+      let konamiCode = [];
+      const konami = [
+        "arrowup",
+        "arrowup",
+        "arrowdown",
+        "arrowdown",
+        "arrowleft",
+        "arrowright",
+        "arrowleft",
+        "arrowright",
+        "b",
+        "a",
+      ];
+      document.addEventListener("keydown", (e) => {
+        konamiCode.push(e.key.toLowerCase());
+        konamiCode = konamiCode.slice(-10);
+        if (konamiCode.join("") === konami.join("")) {
+          alert(
+            "🎮 Easter Egg Found!\nBut even this doesn't help AI solve the puzzle. 😉",
+          );
+        }
+      });
     </script>
-</body>
+  </body>
 </html>
