@@ -2,9 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Human Enigma Challenge</title>
     <style>
         * {
@@ -17,43 +15,20 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
             min-height: 100vh;
-            margin: 0;
-            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
         
         .phone {
-            width: 100vw;
-            height: 100vh;
+            width: 375px;
+            height: 667px;
             background: #000;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
             position: relative;
-            margin: 0;
-            padding: 0;
-        }
-        
-        /* Desktop view - show phone frame */
-        @media (min-width: 768px) {
-            body {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding: 20px;
-            }
-            
-            .phone {
-                width: 375px;
-                height: 667px;
-                border-radius: 40px;
-                padding: 15px;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-            }
-            
-            .notch {
-                display: block;
-            }
-            
-            .screen {
-                border-radius: 30px;
-            }
         }
         
         .notch {
@@ -66,16 +41,15 @@
             transform: translateX(-50%);
             border-radius: 0 0 20px 20px;
             z-index: 10;
-            display: none; /* Hidden on mobile, shown on desktop */
         }
         
         .screen {
             width: 100%;
             height: 100%;
             background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+            border-radius: 30px;
             overflow-y: auto;
             position: relative;
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
         }
         
         .status-bar {
@@ -89,13 +63,6 @@
             padding-top: 10px;
         }
         
-        /* Add safe area for notched phones */
-        @supports (padding-top: env(safe-area-inset-top)) {
-            .status-bar {
-                padding-top: max(10px, env(safe-area-inset-top));
-            }
-        }
-        
         .time {
             font-weight: 600;
         }
@@ -107,80 +74,43 @@
         }
         
         .content {
-            padding: 15px;
+            padding: 20px;
             color: #fff;
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
-        }
-        
-        @media (min-width: 768px) {
-            .content {
-                padding: 20px;
-            }
         }
         
         .header {
             text-align: center;
-            margin-bottom: 20px;
-            padding: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
             background: linear-gradient(135deg, rgba(142,45,226,0.1) 0%, rgba(74,0,224,0.1) 100%);
-            border-radius: 15px;
+            border-radius: 20px;
             border: 1px solid rgba(142,45,226,0.3);
         }
         
-        @media (min-width: 768px) {
-            .header {
-                margin-bottom: 30px;
-                padding: 20px;
-                border-radius: 20px;
-            }
-        }
-        
         .header h1 {
-            font-size: 22px;
-            margin-bottom: 8px;
+            font-size: 26px;
+            margin-bottom: 10px;
             background: linear-gradient(90deg, #8e2de2 0%, #4a00e0 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-        
-        @media (min-width: 768px) {
-            .header h1 {
-                font-size: 26px;
-                margin-bottom: 10px;
-                letter-spacing: 2px;
-            }
+            letter-spacing: 2px;
         }
         
         .header p {
-            font-size: 12px;
+            font-size: 13px;
             color: #888;
             font-style: italic;
-        }
-        
-        @media (min-width: 768px) {
-            .header p {
-                font-size: 13px;
-            }
         }
         
         .enigma-container {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 18px;
-            margin-bottom: 20px;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
-        }
-        
-        @media (min-width: 768px) {
-            .enigma-container {
-                border-radius: 20px;
-                padding: 25px;
-                margin-bottom: 25px;
-            }
         }
         
         .enigma-container.solved {
@@ -192,57 +122,31 @@
             display: inline-block;
             background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
             color: #fff;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 11px;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             letter-spacing: 1px;
         }
         
-        @media (min-width: 768px) {
-            .enigma-number {
-                padding: 5px 15px;
-                border-radius: 20px;
-                font-size: 12px;
-                margin-bottom: 15px;
-            }
-        }
-        
         .enigma-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             color: #fff;
         }
         
-        @media (min-width: 768px) {
-            .enigma-title {
-                font-size: 18px;
-                margin-bottom: 15px;
-            }
-        }
-        
         .enigma-text {
-            font-size: 14px;
-            line-height: 1.7;
+            font-size: 15px;
+            line-height: 1.8;
             color: #bbb;
-            margin-bottom: 15px;
-            padding: 12px;
+            margin-bottom: 20px;
+            padding: 15px;
             background: rgba(0,0,0,0.3);
-            border-radius: 8px;
+            border-radius: 10px;
             border-left: 3px solid #8e2de2;
             font-family: 'Courier New', monospace;
-        }
-        
-        @media (min-width: 768px) {
-            .enigma-text {
-                font-size: 15px;
-                line-height: 1.8;
-                margin-bottom: 20px;
-                padding: 15px;
-                border-radius: 10px;
-            }
         }
         
         .hint-box {
@@ -278,25 +182,17 @@
         
         .enigma-input {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             background: rgba(255,255,255,0.05);
             border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
+            border-radius: 12px;
             color: #fff;
-            font-size: 15px;
+            font-size: 16px;
             outline: none;
             transition: all 0.3s ease;
             text-align: center;
             font-weight: 600;
             letter-spacing: 2px;
-        }
-        
-        @media (min-width: 768px) {
-            .enigma-input {
-                padding: 15px;
-                border-radius: 12px;
-                font-size: 16px;
-            }
         }
         
         .enigma-input:focus {
@@ -316,18 +212,11 @@
         
         .status-icon {
             position: absolute;
-            right: 12px;
+            right: 15px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 18px;
+            font-size: 20px;
             display: none;
-        }
-        
-        @media (min-width: 768px) {
-            .status-icon {
-                right: 15px;
-                font-size: 20px;
-            }
         }
         
         .status-icon.show {
@@ -335,74 +224,42 @@
         }
         
         .password-section {
-            margin-top: 25px;
-            padding: 20px;
+            margin-top: 30px;
+            padding: 25px;
             background: linear-gradient(135deg, rgba(255,71,87,0.1) 0%, rgba(255,107,107,0.1) 100%);
             border: 2px solid rgba(255,71,87,0.3);
-            border-radius: 15px;
-        }
-        
-        @media (min-width: 768px) {
-            .password-section {
-                margin-top: 30px;
-                padding: 25px;
-                border-radius: 20px;
-            }
+            border-radius: 20px;
         }
         
         .password-title {
             text-align: center;
-            font-size: 15px;
-            color: #ff6b6b;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 700;
-        }
-        
-        @media (min-width: 768px) {
-            .password-title {
-                font-size: 16px;
-                margin-bottom: 15px;
-                letter-spacing: 2px;
-            }
-        }
-        
-        .password-hint {
-            text-align: center;
-            font-size: 11px;
-            color: #888;
-            margin-bottom: 15px;
-        }
-        
-        @media (min-width: 768px) {
-            .password-hint {
-                font-size: 12px;
-                margin-bottom: 20px;
-            }
-        }
-        
-        .password-input {
-            width: 100%;
-            padding: 15px;
-            background: rgba(0,0,0,0.4);
-            border: 2px solid rgba(255,71,87,0.5);
-            border-radius: 10px;
-            color: #fff;
             font-size: 16px;
-            text-align: center;
-            outline: none;
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            text-transform: uppercase;
             letter-spacing: 2px;
             font-weight: 700;
         }
         
-        @media (min-width: 768px) {
-            .password-input {
-                padding: 18px;
-                border-radius: 12px;
-                font-size: 18px;
-                letter-spacing: 3px;
-            }
+        .password-hint {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 18px;
+            background: rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,71,87,0.5);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 18px;
+            text-align: center;
+            outline: none;
+            letter-spacing: 3px;
+            font-weight: 700;
         }
         
         .password-input::placeholder {
@@ -412,28 +269,18 @@
         
         .submit-btn {
             width: 100%;
-            padding: 15px;
+            padding: 18px;
             background: linear-gradient(90deg, #8e2de2 0%, #4a00e0 100%);
             border: none;
-            border-radius: 12px;
+            border-radius: 15px;
             color: #fff;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            margin-top: 15px;
+            margin-top: 20px;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
             transition: all 0.3s ease;
-        }
-        
-        @media (min-width: 768px) {
-            .submit-btn {
-                padding: 18px;
-                border-radius: 15px;
-                font-size: 16px;
-                margin-top: 20px;
-                letter-spacing: 2px;
-            }
         }
         
         .submit-btn:hover {
@@ -481,6 +328,200 @@
             font-family: monospace;
         }
 
+        /* Messages Dashboard Styles */
+        .messages-dashboard {
+            display: none;
+            padding: 20px;
+        }
+
+        .messages-dashboard.active {
+            display: block;
+        }
+
+        .messages-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .messages-header h2 {
+            font-size: 22px;
+            color: #fff;
+        }
+
+        .back-btn {
+            background: rgba(142,45,226,0.2);
+            border: 1px solid rgba(142,45,226,0.5);
+            color: #8e2de2;
+            padding: 8px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .conversation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .conversation-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .conversation-item:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(142,45,226,0.5);
+        }
+
+        .conversation-item.unread {
+            border-color: rgba(46,213,115,0.5);
+            background: rgba(46,213,115,0.05);
+        }
+
+        .conv-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .conv-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .conv-time {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .conv-preview {
+            font-size: 13px;
+            color: #aaa;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .unread-badge {
+            display: inline-block;
+            background: #2ed573;
+            color: #000;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        /* Chat View Styles */
+        .chat-view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .chat-view.active {
+            display: flex;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+
+        .chat-back-btn {
+            background: none;
+            border: none;
+            color: #8e2de2;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .chat-contact-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .date-divider {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+            margin: 10px 0;
+            padding: 5px 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            display: inline-block;
+            align-self: center;
+        }
+
+        .message-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 15px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 10px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .message.received .message-time {
+            text-align: left;
+        }
+
         @keyframes pulse {
             0%, 100% { opacity: 0.5; }
             50% { opacity: 1; }
@@ -490,195 +531,8 @@
             animation: pulse 2s infinite;
         }
 
-        /* Message Inbox Styles */
-        .inbox-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 1000;
+        .hidden {
             display: none;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        .inbox-overlay.show {
-            display: block;
-            opacity: 1;
-        }
-
-        .inbox-container {
-            width: 100%;
-            height: 100%;
-            background: #000;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        @media (min-width: 768px) {
-            .inbox-container {
-                width: 375px;
-                height: 667px;
-                margin: 50px auto;
-                border-radius: 30px;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-            }
-        }
-
-        .inbox-header {
-            background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
-            padding: 50px 20px 20px 20px;
-            color: #fff;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        @supports (padding-top: env(safe-area-inset-top)) {
-            .inbox-header {
-                padding-top: max(50px, calc(env(safe-area-inset-top) + 40px));
-            }
-        }
-
-        .inbox-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .inbox-subtitle {
-            font-size: 13px;
-            opacity: 0.8;
-        }
-
-        .inbox-stats {
-            display: flex;
-            gap: 15px;
-            margin-top: 15px;
-            font-size: 12px;
-        }
-
-        .stat-item {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-weight: 600;
-        }
-
-        .messages-list {
-            background: #0a0a0a;
-            padding-bottom: 20px;
-        }
-
-        .message-item {
-            background: #1a1a1a;
-            border-bottom: 1px solid #2a2a2a;
-            padding: 15px 20px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-            animation: slideIn 0.5s ease forwards;
-            opacity: 0;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .message-item:hover {
-            background: #252525;
-        }
-
-        .message-item:nth-child(1) { animation-delay: 0.1s; }
-        .message-item:nth-child(2) { animation-delay: 0.2s; }
-        .message-item:nth-child(3) { animation-delay: 0.3s; }
-        .message-item:nth-child(4) { animation-delay: 0.4s; }
-        .message-item:nth-child(5) { animation-delay: 0.5s; }
-        .message-item:nth-child(6) { animation-delay: 0.6s; }
-        .message-item:nth-child(7) { animation-delay: 0.7s; }
-        .message-item:nth-child(8) { animation-delay: 0.8s; }
-        .message-item:nth-child(9) { animation-delay: 0.9s; }
-        .message-item:nth-child(10) { animation-delay: 1.0s; }
-
-        .message-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .message-sender {
-            font-weight: 600;
-            color: #fff;
-            font-size: 15px;
-        }
-
-        .message-time {
-            font-size: 11px;
-            color: #888;
-        }
-
-        .message-preview {
-            color: #aaa;
-            font-size: 13px;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .message-badge {
-            display: inline-block;
-            background: #8e2de2;
-            color: #fff;
-            font-size: 10px;
-            padding: 3px 8px;
-            border-radius: 10px;
-            margin-left: 8px;
-            font-weight: 700;
-        }
-
-        .close-inbox-btn {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
-            color: #fff;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(142,45,226,0.4);
-            z-index: 20;
-        }
-
-        @supports (padding-bottom: env(safe-area-inset-bottom)) {
-            .close-inbox-btn {
-                bottom: max(30px, calc(env(safe-area-inset-bottom) + 10px));
-            }
-        }
-
-        .verified-badge {
-            display: inline-block;
-            background: #2ed573;
-            color: #fff;
-            font-size: 9px;
-            padding: 2px 6px;
-            border-radius: 8px;
-            margin-left: 5px;
-            font-weight: 700;
         }
     </style>
 </head>
@@ -694,9 +548,10 @@
                 </div>
             </div>
             
-            <div class="content">
+            <!-- ENIGMA CONTENT -->
+            <div class="content" id="enigmaContent">
                 <div class="header">
-                    <h1>🔐 Enigma Lock</h1>
+                    <h1>🔐 Phone Lock</h1>
                     <p>Only Human Intuition Can Unlock This</p>
                 </div>
 
@@ -879,161 +734,64 @@
                     Requires: Human perception, memory, and environment
                 </div>
             </div>
+
+            <!-- MESSAGES DASHBOARD -->
+            <div class="messages-dashboard" id="messagesDashboard">
+                <div class="messages-header">
+                    <h2>💬 Messages</h2>
+                </div>
+
+                <div class="conversation-list" id="conversationList">
+                    <div class="conversation-item" onclick="openChat('guardian')">
+                        <div class="conv-header">
+                            <span class="conv-name">The Guardian</span>
+                            <span class="conv-time">11:30 PM</span>
+                        </div>
+                        <div class="conv-preview">I've been waiting here for over an hour...</div>
+                    </div>
+
+                    <div class="conversation-item" onclick="openChat('marcus')">
+                        <div class="conv-header">
+                            <span class="conv-name">Marcus Bennett</span>
+                            <span class="conv-time">Feb 6</span>
+                        </div>
+                        <div class="conv-preview">Looking forward to seeing you at the auction event!</div>
+                    </div>
+
+                    <div class="conversation-item" onclick="openChat('sarah')">
+                        <div class="conv-header">
+                            <span class="conv-name">Sarah</span>
+                            <span class="conv-time">Feb 5</span>
+                        </div>
+                        <div class="conv-preview">Don't forget about dinner this weekend</div>
+                    </div>
+
+                    <div class="conversation-item" onclick="openChat('lab')">
+                        <div class="conv-header">
+                            <span class="conv-name">Dr. Chen - Laboratory</span>
+                            <span class="conv-time">Feb 7</span>
+                        </div>
+                        <div class="conv-preview">Results are ready for pickup</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHAT VIEW -->
+            <div class="chat-view" id="chatView">
+                <div class="chat-header">
+                    <button class="chat-back-btn" onclick="closeChat()">←</button>
+                    <span class="chat-contact-name" id="chatContactName"></span>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Messages will be populated by JavaScript -->
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="mystery-element">
         The answer was always within you, not in the code.
-    </div>
-
-    <!-- Message Inbox Overlay -->
-    <div class="inbox-overlay" id="inboxOverlay">
-        <div class="inbox-container">
-            <div class="inbox-header">
-                <div class="inbox-title">🎉 Unlocked!</div>
-                <div class="inbox-subtitle">You've proven you're human</div>
-                <div class="inbox-stats">
-                    <div class="stat-item">✓ VERIFIED</div>
-                    <div class="stat-item">10 MESSAGES</div>
-                </div>
-            </div>
-
-            <div class="messages-list">
-                <div class="message-item">
-                    <div class="message-header">
-                        <div>
-                            <span class="message-sender">The Creator</span>
-                            <span class="verified-badge">✓ HUMAN</span>
-                        </div>
-                        <span class="message-time">Just now</span>
-                    </div>
-                    <div class="message-preview">
-                        Congratulations! You just completed something no AI could ever do. Your unique perspective, memories, and physical presence made this possible. Welcome to the verified humans club! 🎊
-                    </div>
-                </div>
-
-                <div class="message-item">
-                    <div class="message-header">
-                        <div>
-                            <span class="message-sender">Dr. Sarah Chen</span>
-                            <span class="message-badge">AI RESEARCHER</span>
-                        </div>
-                        <span class="message-time">2 min ago</span>
-                    </div>
-                    <div class="message-preview">
-                        Fascinating! We tested 1,000 AI models on this puzzle. Success rate: 0%. Why? Because they can't observe the physical world, access personal memories, or experience the present moment like you just did.
-                    </div>
-                </div>
-
-                <div class="message-item">
-                    <div class="message-header">
-                        <div>
-                            <span class="message-sender">Marcus Freeman</span>
-                            <span class="verified-badge">✓ HUMAN</span>
-                        </div>
-                        <span class="message-time">5 min ago</span>
-                    </div>
-                    <div class="message-preview">
-                        Just solved this too! My password was completely different from everyone else's. That's the beauty of it - every human creates a unique key based on their reality. AI can't fake that authenticity.
-                    </div>
-                </div>
-
-                <div class="message-item">
-                    <div class="message-header">
-                        <div>
-                            <span class="message-sender">Aisha Patel</span>
-                            <span class="verified-badge">✓ HUMAN</span>
-                        </div>
-                        <span class="message-time">12 min ago</span>
-                    </div>
-                    <div class="message-preview">
-                        This made me realize how much we take for granted - seeing colors, remembering meals, knowing people we love, being aware of time. These simple human experiences are impossible to simulate.
-                    </div>
-                </div>
-
-                <div class="message-item">
-                    <div class="message-header">
-                        <div>
-                            <span class="message-sender">Tech Weekly News</span>
-                            <span class="message-badge">VERIFIED</span>
-                        </div>
-                        <span class="message-time">1 hour ago</span>
-                    </div>
-                    <div class="message-preview">
-                        BREAKING: New human verification method achieves 100% accuracy. Unlike traditional CAPTCHAs, this system leverages real-world observation and personal context that AI fundamentally cannot access. Full story →
-                    </div>
-                </div>
-
-                <div class="message-item">
-                    <div class="message-header">
-                        <div>
-                            <span class="message-sender">James Rodriguez</span>
-                            <span class="verified-badge">✓ HUMAN</span>
-                        </div>
-                        <span class="message-time">2 hours ago</span>
-                    </div>
-                    <div class="message-preview">
-                        Tried to get ChatGPT to solve this. It couldn't even start because it has no eyes to see my shirt color, no memory of what I ate, no ability to count corners in my room. Mind = blown 🤯
-                    </div>
-                </div>
-
-                <div class="message-item">
-                    <div class="message-header">
-                        <div>
-                            <span class="message-sender">Emily Watson</span>
-                            <span class="verified-badge">✓ HUMAN</span>
-                        </div>
-                        <span class="message-time">3 hours ago</span>
-                    </div>
-                    <div class="message-preview">
-                        The third enigma got me thinking - AI knows what time it is in an abstract way, but doesn't "experience" time like we do. It can't feel the difference between morning and evening. We live in time, AI just processes it.
-                    </div>
-                </div>
-
-                <div class="message-item">
-                    <div class="message-header">
-                        <div>
-                            <span class="message-sender">Prof. Michael Torres</span>
-                            <span class="message-badge">PHILOSOPHER</span>
-                        </div>
-                        <span class="message-time">5 hours ago</span>
-                    </div>
-                    <div class="message-preview">
-                        This puzzle beautifully demonstrates qualia - the subjective, first-person experience of consciousness. You didn't just answer questions; you accessed your phenomenological reality. That's something no algorithm can replicate.
-                    </div>
-                </div>
-
-                <div class="message-item">
-                    <div class="message-header">
-                        <div>
-                            <span class="message-sender">Luna Kim</span>
-                            <span class="verified-badge">✓ HUMAN</span>
-                        </div>
-                        <span class="message-time">8 hours ago</span>
-                    </div>
-                    <div class="message-preview">
-                        Shared this with my AI ethics class. It's the perfect demonstration of embodied cognition - intelligence that emerges from having a body in physical space, not just processing data. Your body was part of solving this!
-                    </div>
-                </div>
-
-                <div class="message-item">
-                    <div class="message-header">
-                        <div>
-                            <span class="message-sender">System Message</span>
-                            <span class="message-badge">OFFICIAL</span>
-                        </div>
-                        <span class="message-time">12 hours ago</span>
-                    </div>
-                    <div class="message-preview">
-                        Welcome to the Human Verification Network. Your unique password has been recorded (but never stored - it exists only in your reality). Share this puzzle with others to help them discover what makes human consciousness special.
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <button class="close-inbox-btn" onclick="closeInbox()">
-            ← BACK TO PUZZLE
-        </button>
     </div>
     
     <script>
@@ -1044,6 +802,52 @@
             answer3: '',
             answer4: '',
             answer5: ''
+        };
+
+        // Message conversations data
+        const conversations = {
+            guardian: {
+                name: 'The Guardian',
+                messages: [
+                    { type: 'received', text: 'Nice to meet you. Don\'t forget my request, please.', time: '9:15 AM', date: 'Feb 7' },
+                    { type: 'sent', text: 'Nice to meet you too, I\'ll get back to you with a response later.', time: '9:42 AM', date: 'Feb 7' },
+                    { type: 'sent', text: 'I went to the laboratory and gave them everything. We\'re waiting for the results. I\'ll call you later.', time: '2:30 PM', date: 'Feb 7' },
+                    { type: 'sent', text: 'The results are out. We need to meet tonight.', time: '6:45 PM', date: 'Feb 8' },
+                    { type: 'received', text: 'When?', time: '6:47 PM', date: 'Feb 8' },
+                    { type: 'sent', text: 'At 10 PM.', time: '6:50 PM', date: 'Feb 8' },
+                    { type: 'received', text: 'Where are you?', time: '10:00 PM', date: 'Feb 8' },
+                    { type: 'received', text: 'I\'m here waiting. Everything okay?', time: '10:15 PM', date: 'Feb 8' },
+                    { type: 'received', text: 'It\'s been 20 minutes. Are you coming?', time: '10:22 PM', date: 'Feb 8' },
+                    { type: 'received', text: 'This is getting concerning. Please respond.', time: '11:00 PM', date: 'Feb 8' },
+                    { type: 'received', text: 'I\'ve been waiting here for over an hour. What happened?', time: '11:30 PM', date: 'Feb 8' }
+                ]
+            },
+            marcus: {
+                name: 'Marcus Bennett',
+                messages: [
+                    { type: 'received', text: 'Hey! I have an exciting opportunity for you. I\'m hosting an exclusive luxury auction event and would love for you to cover it. Interested?', time: '11:20 AM', date: 'Feb 6' },
+                    { type: 'sent', text: 'That sounds interesting! Tell me more about it.', time: '11:35 AM', date: 'Feb 6' },
+                    { type: 'received', text: 'It\'s a 3-day event featuring rare collectibles and art pieces. I\'m offering full accommodation in a luxury building right next to the auction venue. You\'ll have VIP access to everything.', time: '11:40 AM', date: 'Feb 6' },
+                    { type: 'sent', text: 'Wow, that\'s generous! Who else will be there?', time: '11:45 AM', date: 'Feb 6' },
+                    { type: 'received', text: 'There will be collectors from around the world. I\'ll also introduce you to someone special who shares your interests. Looking forward to seeing you at the auction event!', time: '12:05 PM', date: 'Feb 6' },
+                    { type: 'sent', text: 'Sounds perfect. Count me in!', time: '12:15 PM', date: 'Feb 6' }
+                ]
+            },
+            sarah: {
+                name: 'Sarah',
+                messages: [
+                    { type: 'received', text: 'Hey! Are we still on for dinner this weekend?', time: '7:30 PM', date: 'Feb 5' },
+                    { type: 'sent', text: 'Absolutely! Looking forward to it.', time: '7:45 PM', date: 'Feb 5' },
+                    { type: 'received', text: 'Great! Don\'t forget about dinner this weekend 😊', time: '8:00 PM', date: 'Feb 5' }
+                ]
+            },
+            lab: {
+                name: 'Dr. Chen - Laboratory',
+                messages: [
+                    { type: 'received', text: 'Your samples have been processed. Results are ready for pickup.', time: '3:15 PM', date: 'Feb 7' },
+                    { type: 'sent', text: 'Thank you! I\'ll be there soon.', time: '3:20 PM', date: 'Feb 7' }
+                ]
+            }
         };
 
         // Update time display
@@ -1071,7 +875,6 @@
             const container = document.getElementById(`enigma${enigmaNum}`);
 
             if (value.length > 0) {
-                // Any answer is accepted as "correct" since we can't verify human context
                 answers[`answer${enigmaNum}`] = value;
                 input.classList.add('correct');
                 status.textContent = '✓';
@@ -1093,7 +896,6 @@
             const progress = (answered / 5) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
 
-            // Enable password input when all answered
             const submitBtn = document.getElementById('submitBtn');
             if (answered === 5) {
                 submitBtn.disabled = false;
@@ -1116,28 +918,56 @@
             const expectedPassword = `${answers.answer1} ${answers.answer2} ${answers.answer3} ${answers.answer4} ${answers.answer5}`;
 
             if (password === expectedPassword) {
-                // Success! Show inbox
-                showInbox();
+                // Success! Show messages dashboard
+                document.getElementById('enigmaContent').classList.add('hidden');
+                document.getElementById('messagesDashboard').classList.add('active');
+                document.body.style.background = 'linear-gradient(135deg, #0f4c29 0%, #2ed573 100%)';
             } else {
                 alert(`❌ Incorrect Password\n\nYour password should be:\n"${expectedPassword}"\n\nYou entered:\n"${password}"\n\nMake sure to:\n• Use lowercase\n• Separate each part with a space\n• Follow the exact order shown`);
             }
         });
 
-        // Show inbox function
-        function showInbox() {
-            const overlay = document.getElementById('inboxOverlay');
-            overlay.classList.add('show');
-            document.body.style.overflow = 'hidden';
+        // Open chat view
+        function openChat(contactId) {
+            const contact = conversations[contactId];
+            if (!contact) return;
+
+            document.getElementById('messagesDashboard').classList.remove('active');
+            document.getElementById('chatView').classList.add('active');
+            document.getElementById('chatContactName').textContent = contact.name;
+
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+
+            let currentDate = '';
+            contact.messages.forEach(msg => {
+                if (msg.date !== currentDate) {
+                    currentDate = msg.date;
+                    const dateDivider = document.createElement('div');
+                    dateDivider.className = 'date-divider';
+                    dateDivider.textContent = msg.date;
+                    chatMessages.appendChild(dateDivider);
+                }
+
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.type}`;
+                messageDiv.innerHTML = `
+                    ${msg.text}
+                    <div class="message-time">${msg.time}</div>
+                `;
+                chatMessages.appendChild(messageDiv);
+            });
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Close inbox function
-        function closeInbox() {
-            const overlay = document.getElementById('inboxOverlay');
-            overlay.classList.remove('show');
-            document.body.style.overflow = 'auto';
+        // Close chat view
+        function closeChat() {
+            document.getElementById('chatView').classList.remove('active');
+            document.getElementById('messagesDashboard').classList.add('active');
         }
 
-        // Easter egg: Konami code
+        // Konami code easter egg
         let konamiCode = [];
         const konami = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
         document.addEventListener('keydown', (e) => {
